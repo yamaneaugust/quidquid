@@ -1,0 +1,46 @@
+# Configuration file for Lesion Pre-Screening CNN
+
+# Model configuration
+model:
+  type: "cnn"  # Options: "cnn", "resnet"
+  num_classes: 3
+  dropout_rate: 0.5
+  input_size: [224, 224]
+
+# Training configuration
+training:
+  batch_size: 32
+  epochs: 50
+  learning_rate: 0.001
+  validation_split: 0.2
+  early_stopping_patience: 10
+  save_dir: "data/models"
+
+# Data configuration
+data:
+  raw_dir: "data/raw"
+  processed_dir: "data/processed"
+  augmentation: true
+
+# Class names (modify based on your dataset)
+classes:
+  - "benign"
+  - "suspicious"
+  - "malignant"
+
+# Risk assessment configuration
+risk_assessment:
+  # Weights for different risk factors (should sum to 1.0)
+  model_weight: 0.6
+  visual_weight: 0.4
+
+  # Risk thresholds (0-100 scale)
+  thresholds:
+    low: 25
+    moderate: 50
+    high: 75
+
+# Report configuration
+report:
+  page_size: "letter"  # Options: "letter", "a4"
+  include_disclaimers: true
