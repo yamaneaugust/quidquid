@@ -35,7 +35,7 @@ env/
 
 # Jupyter Notebooks
 .ipynb_checkpoints
-*.ipynb
+# Note: We keep example notebooks in notebooks/ directory
 
 # Data files (keep structure but ignore actual data)
 data/raw/*
