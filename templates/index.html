@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesion Pre-Screening</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>LESION PRE-SCREENING</h1>
+            <p class="subtitle">AI-Powered Risk Assessment</p>
+        </header>
+
+        <!-- Disclaimer -->
+        <div class="disclaimer">
+            <strong>⚠️ NOT FOR MEDICAL DIAGNOSIS</strong><br>
+            This system is for educational and documentation purposes only.<br>
+            Always consult a qualified healthcare professional for medical decisions.
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Upload Section -->
+        <div class="upload-section">
+            <h2>Upload Lesion Image</h2>
+
+            <div class="upload-area" id="uploadArea">
+                <input type="file" id="fileInput" accept="image/*" hidden>
+                <div class="upload-prompt">
+                    <div class="upload-icon">📁</div>
+                    <p>Click to upload or drag & drop</p>
+                    <p class="upload-hint">JPG, PNG (max 16MB)</p>
+                </div>
+                <img id="preview" class="preview-image" style="display: none;">
+            </div>
+
+            <button id="analyzeBtn" class="btn" style="display: none;">ANALYZE</button>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results" style="display: none;">
+            <div class="divider"></div>
+
+            <h2>RISK ASSESSMENT</h2>
+
+            <div class="risk-card">
+                <div class="risk-score" id="riskScore">--</div>
+                <p class="risk-label">RISK SCORE (0-100)</p>
+                <div class="risk-level" id="riskLevel">--</div>
+            </div>
+
+            <h3>Model Predictions</h3>
+            <div class="predictions" id="predictions"></div>
+
+            <div class="divider"></div>
+
+            <h3>Visual Features (ABCDE Criteria)</h3>
+            <div class="features" id="features"></div>
+
+            <div class="divider"></div>
+
+            <h3>Recommendations</h3>
+            <div class="recommendations" id="recommendations"></div>
+
+            <div class="divider"></div>
+
+            <button id="downloadBtn" class="btn">GENERATE PDF REPORT</button>
+        </div>
+
+        <!-- Loading -->
+        <div id="loading" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Analyzing image...</p>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p>Lesion Pre-Screening CNN System v0.1.0</p>
+            <p>For educational and research purposes only</p>
+            <p>Always seek professional medical advice</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
