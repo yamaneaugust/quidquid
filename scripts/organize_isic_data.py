@@ -169,15 +169,6 @@ def organize_isic_task3_format(
     print(f"\nClass distribution:")
     print(df['diagnosis'].value_counts())
 
-    # Now organize using the standard function
-    organize_isic_with_csv(
-        images_dir=images_dir,
-        labels_csv=None,  # We'll use the df directly
-        output_dir=output_dir,
-        image_col=image_col,
-        label_col='diagnosis'
-    )
-
     # Create output directory structure
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
