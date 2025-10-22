@@ -22,6 +22,44 @@ def extract_zip(zip_path: str, extract_to: str):
     print(f"Extracted to {extract_to}")
 
 
+def extract_csv_from_zip(zip_path: str, extract_to: str = None) -> str:
+    """
+    Extract CSV from a zip file (some ISIC ground truth files come zipped).
+
+    Args:
+        zip_path: Path to zip file
+        extract_to: Directory to extract to (defaults to same dir as zip)
+
+    Returns:
+        Path to extracted CSV file
+    """
+    zip_path = Path(zip_path)
+    if extract_to is None:
+        extract_to = zip_path.parent
+
+    extract_to = Path(extract_to)
+
+    print(f"Extracting CSV from {zip_path.name}...")
+
+    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+        # Find CSV file in zip
+        csv_files = [f for f in zip_ref.namelist() if f.endswith('.csv')]
+
+        if not csv_files:
+            raise ValueError(f"No CSV file found in {zip_path}")
+
+        if len(csv_files) > 1:
+            print(f"Warning: Multiple CSV files found, using first one: {csv_files[0]}")
+
+        csv_file = csv_files[0]
+        zip_ref.extract(csv_file, extract_to)
+
+        extracted_path = extract_to / csv_file
+        print(f"Extracted: {extracted_path}")
+
+        return str(extracted_path)
+
+
 def organize_isic_with_csv(
     images_dir: str,
     labels_csv: str,
@@ -219,6 +257,7 @@ Examples:
 
     parser.add_argument('--extract', type=str, help='Zip file to extract')
     parser.add_argument('--extract-to', type=str, help='Directory to extract to')
+    parser.add_argument('--extract-csv', type=str, help='Extract CSV from zip (for ground truth zips)')
 
     parser.add_argument('--images-dir', type=str, help='Directory containing images')
     parser.add_argument('--labels-csv', type=str, help='CSV file with labels')
@@ -230,6 +269,13 @@ Examples:
     parser.add_argument('--task3-format', action='store_true', help='Use ISIC Task 3 multi-hot format')
 
     args = parser.parse_args()
+
+    # Extract CSV from zip if requested
+    if args.extract_csv:
+        csv_path = extract_csv_from_zip(args.extract_csv)
+        print(f"\nExtracted CSV: {csv_path}")
+        print("You can now use this CSV with --labels-csv or --groundtruth-csv")
+        return
 
     # Extract zip if requested
     if args.extract:

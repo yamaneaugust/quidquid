@@ -42,9 +42,18 @@ if exist "%ZIP_FILE%" (
 )
 
 echo.
-echo Step 3: Organizing images into class folders...
-set IMAGES_DIR=%EXTRACT_DIR%\ISIC2018_Task3_Training_Input
+echo Step 3: Extracting ground truth CSV (if zipped)...
 set CSV_FILE=%DOWNLOADS%\ISIC2018_Task3_Training_GroundTruth.csv
+set CSV_ZIP=%DOWNLOADS%\ISIC2018_Task3_Training_GroundTruth.zip
+
+if exist "%CSV_ZIP%" (
+    echo Found zipped ground truth, extracting...
+    python scripts/organize_isic_data.py --extract-csv "%CSV_ZIP%"
+)
+
+echo.
+echo Step 4: Organizing images into class folders...
+set IMAGES_DIR=%EXTRACT_DIR%\ISIC2018_Task3_Training_Input
 
 if exist "%CSV_FILE%" (
     python scripts/organize_isic_data.py --images-dir "%IMAGES_DIR%" --groundtruth-csv "%CSV_FILE%" --output-dir data\raw --task3-format
@@ -55,7 +64,7 @@ if exist "%CSV_FILE%" (
 )
 
 echo.
-echo Step 4: (Optional) Simplify to 3 classes...
+echo Step 5: (Optional) Simplify to 3 classes...
 set /p SIMPLIFY="Do you want to simplify from 7 to 3 classes? (y/n): "
 if /i "%SIMPLIFY%"=="y" (
     python scripts/simplify_classes.py --source data\raw --target data\raw_simplified --copy
