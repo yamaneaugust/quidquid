@@ -230,9 +230,76 @@ class LesionFeatureExtractor:
         return min(color_variation, 1.0)
 
     @staticmethod
+    def calculate_diameter_score(image: np.ndarray) -> float:
+        """
+        Calculate diameter concern score (D in ABCDE).
+
+        Note: Without a scale reference, this estimates relative size.
+        Clinical threshold is 6mm, but we estimate based on lesion area
+        relative to image size.
+
+        Args:
+            image: Image as numpy array
+
+        Returns:
+            Diameter concern score (0-1, higher = larger/more concerning)
+        """
+        gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+
+        # Find contours
+        _, binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        contours, _ = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+        if not contours:
+            return 0.0
+
+        # Get largest contour (lesion)
+        largest_contour = max(contours, key=cv2.contourArea)
+        lesion_area = cv2.contourArea(largest_contour)
+
+        # Get image dimensions
+        image_area = image.shape[0] * image.shape[1]
+
+        # Calculate relative size (as percentage of image)
+        relative_size = lesion_area / image_area
+
+        # Score based on relative size
+        # Larger lesions (>10% of image) get higher scores
+        if relative_size > 0.15:
+            return 0.9
+        elif relative_size > 0.10:
+            return 0.7
+        elif relative_size > 0.05:
+            return 0.5
+        elif relative_size > 0.02:
+            return 0.3
+        else:
+            return 0.1
+
+    @staticmethod
+    def calculate_evolution_score(image: np.ndarray) -> dict:
+        """
+        Placeholder for evolution assessment (E in ABCDE).
+
+        Evolution requires comparison with previous images over time.
+        This cannot be assessed from a single image.
+
+        Args:
+            image: Image as numpy array
+
+        Returns:
+            Dictionary with evolution info and placeholder score
+        """
+        return {
+            'score': None,  # Cannot assess without historical data
+            'note': 'Requires comparison with previous images',
+            'recommendation': 'Monitor for changes in size, shape, or color over time'
+        }
+
+    @staticmethod
     def extract_all_features(image: np.ndarray) -> dict:
         """
-        Extract all visual features from the image.
+        Extract all ABCDE visual features from the image.
 
         Args:
             image: Image as numpy array
@@ -240,10 +307,16 @@ class LesionFeatureExtractor:
         Returns:
             Dictionary of feature name to value
         """
+        evolution_data = LesionFeatureExtractor.calculate_evolution_score(image)
+
         return {
             'asymmetry': LesionFeatureExtractor.calculate_asymmetry(image),
             'border_irregularity': LesionFeatureExtractor.calculate_border_irregularity(image),
             'color_variation': LesionFeatureExtractor.calculate_color_variation(image),
+            'diameter_score': LesionFeatureExtractor.calculate_diameter_score(image),
+            'evolution_score': evolution_data['score'],
+            'evolution_note': evolution_data['note'],
+            'evolution_recommendation': evolution_data['recommendation'],
         }
 
 

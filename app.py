@@ -232,14 +232,26 @@ if uploaded_file is not None:
                 st.markdown("<h3>Visual Features (ABCDE Criteria)</h3>", unsafe_allow_html=True)
 
                 features_display = {
-                    'asymmetry': 'Asymmetry',
-                    'border_irregularity': 'Border Irregularity',
-                    'color_variation': 'Color Variation'
+                    'asymmetry': 'A - Asymmetry',
+                    'border_irregularity': 'B - Border Irregularity',
+                    'color_variation': 'C - Color Variation',
+                    'diameter_score': 'D - Diameter (Relative Size)'
                 }
 
                 for key, label in features_display.items():
                     value = visual_features.get(key, 0)
-                    st.progress(value, text=f"{label}: {value:.2f}")
+                    if value is not None:
+                        st.progress(value, text=f"{label}: {value:.2f}")
+
+                # Evolution (E) - Special handling since it needs historical data
+                evolution_note = visual_features.get('evolution_note', 'N/A')
+                evolution_rec = visual_features.get('evolution_recommendation', '')
+
+                st.info(f"""
+                **E - Evolution**: {evolution_note}
+
+                {evolution_rec}
+                """)
 
                 st.markdown("---")
 
