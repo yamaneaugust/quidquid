@@ -116,22 +116,26 @@ class LesionRiskScorer:
 
         Args:
             visual_features: Dictionary of feature name to value (0-1 scale)
-                Expected keys: asymmetry, border_irregularity, color_variation
+                Expected keys: asymmetry, border_irregularity, color_variation, diameter_score
+                Note: evolution_score may be None (requires historical data)
 
         Returns:
             Visual risk score (0-1)
         """
-        # Weights for ABCDE criteria
+        # Weights for ABCDE criteria (excluding Evolution which needs historical data)
         weights = {
-            'asymmetry': 0.3,
-            'border_irregularity': 0.3,
-            'color_variation': 0.4,
+            'asymmetry': 0.25,
+            'border_irregularity': 0.25,
+            'color_variation': 0.25,
+            'diameter_score': 0.25,
         }
 
         visual_risk = 0.0
         for feature, value in visual_features.items():
             weight = weights.get(feature, 0.0)
-            visual_risk += value * weight
+            # Skip None values (e.g., evolution_score)
+            if value is not None and weight > 0:
+                visual_risk += value * weight
 
         return visual_risk
 

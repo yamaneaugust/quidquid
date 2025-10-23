@@ -108,7 +108,7 @@ st.markdown("""
 # Title
 st.markdown("<p style='text-align: center; font-size: 1.5rem; color: #888888; margin-bottom: 0.5rem; letter-spacing: 8px; font-weight: 300;'>Modin</p>", unsafe_allow_html=True)
 st.markdown("<h1 style='text-align: center; font-size: 3rem; margin-bottom: 0;'>Lesion Pre-Screening</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #888888; margin-top: 0;'>AI-Powered Risk Assessment</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #888888; margin-top: 0;'>AI-Powered Skin Cancer Risk Assessment</p>", unsafe_allow_html=True)
 
 # Critical disclaimer
 st.error("""
