@@ -23,8 +23,8 @@ from src.preprocessing.image_processing import load_image
 
 # Page config
 st.set_page_config(
-    page_title="Lesion Pre-Screening",
-    page_icon="🔬",
+    page_title="Modin - Lesion Pre-Screening",
+    page_icon="M",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
@@ -107,7 +107,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Title
-st.markdown("<h1 style='text-align: center; font-size: 3rem; margin-bottom: 0;'>LESION PRE-SCREENING</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; font-size: 1.5rem; color: #888888; margin-bottom: 0.5rem; letter-spacing: 8px; font-weight: 300;'>MODIN</p>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; font-size: 3rem; margin-bottom: 0;'>Lesion Pre-Screening</h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center; color: #888888; margin-top: 0;'>AI-Powered Risk Assessment</p>", unsafe_allow_html=True)
 
 # Critical disclaimer
@@ -287,6 +288,10 @@ if uploaded_file is not None:
 
                         except Exception as e:
                             st.error(f"Error generating PDF: {str(e)}")
+                            # Show full traceback for debugging
+                            import traceback
+                            with st.expander("Show error details"):
+                                st.code(traceback.format_exc())
 
             except Exception as e:
                 st.error(f"Error during analysis: {str(e)}")
