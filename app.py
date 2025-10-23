@@ -162,8 +162,6 @@ if predictor is None:
     st.error("Failed to load model. Please check the model file.")
     st.stop()
 
-st.success("✓ AI Model Loaded")
-
 st.markdown("---")
 
 # File upload
