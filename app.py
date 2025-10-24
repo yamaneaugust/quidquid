@@ -23,7 +23,7 @@ from src.preprocessing.image_processing import load_image
 
 # Page config
 st.set_page_config(
-    page_title="Modin - Lesion Pre-Screening",
+    page_title="Modium - Lesion Pre-Screening",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
