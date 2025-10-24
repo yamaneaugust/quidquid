@@ -13,7 +13,9 @@ import numpy as np
 from PIL import Image
 import io
 import sys
+import os
 from pathlib import Path
+import gdown
 
 # Add src to path
 sys.path.append(str(Path(__file__).parent.parent))
@@ -136,23 +138,24 @@ def load_model(model_path, class_names):
 # Configuration
 MODEL_PATH = "data/models/best_model.pth"
 CLASS_NAMES = ["benign", "suspicious", "malignant"]
+GDRIVE_FILE_ID = "1ybi3JF3gWAlahmN3h-pxd-oQGTzxE77K"
 
-# Check if model exists
-model_exists = Path(MODEL_PATH).exists()
+# Auto-download model from Google Drive if not present
+if not Path(MODEL_PATH).exists():
+    with st.spinner("Downloading AI model from cloud storage (first time only)..."):
+        try:
+            # Create directory if needed
+            os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
 
-if not model_exists:
-    st.warning(f"""
-    **Model not found!**
+            # Download from Google Drive
+            url = f"https://drive.google.com/uc?id={GDRIVE_FILE_ID}"
+            gdown.download(url, MODEL_PATH, quiet=False)
 
-    Please ensure you have a trained model at:
-    `{MODEL_PATH}`
-
-    Train a model first using:
-    ```
-    python -m src.model.train --data-dir data/raw_simplified --num-classes 3 --epochs 30
-    ```
-    """)
-    st.stop()
+            st.success("Model downloaded successfully!")
+        except Exception as e:
+            st.error(f"Failed to download model: {str(e)}")
+            st.info("Please contact support or try again later.")
+            st.stop()
 
 # Load model
 with st.spinner("Loading AI model..."):
