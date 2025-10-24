@@ -25,10 +25,23 @@ from src.preprocessing.image_processing import load_image
 
 # Page config
 st.set_page_config(
-    page_title="Modium - Lesion Pre-Screening",
+    page_title="Modium - AI-Powered Skin Lesion Pre-Screening",
+    page_icon="🔬",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
+
+# SEO Meta Tags for Google indexing
+st.markdown("""
+<meta name="description" content="Modium - AI-powered skin lesion pre-screening tool. Upload images for risk assessment using CNN deep learning and ABCDE criteria analysis. Free educational tool for skin cancer awareness.">
+<meta name="keywords" content="skin lesion, melanoma screening, AI dermatology, skin cancer detection, ABCDE criteria, lesion analysis, deep learning, medical AI">
+<meta name="author" content="Modium">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Modium - AI Skin Lesion Pre-Screening">
+<meta property="og:description" content="Free AI-powered skin lesion risk assessment using deep learning and ABCDE criteria analysis">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://modium.io">
+""", unsafe_allow_html=True)
 
 # Custom CSS for black minimalist theme
 st.markdown("""
