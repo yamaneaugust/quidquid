@@ -247,7 +247,7 @@ if uploaded_file is not None:
 
             # Run prediction
             try:
-                predictions, visual_features = predictor.predict_image(temp_path)
+                predictions, visual_features, heatmap = predictor.predict_image(temp_path)
                 risk_score = predictor.assess_risk(predictions, visual_features)
 
                 # Save analysis to database if user is logged in
@@ -306,6 +306,17 @@ if uploaded_file is not None:
                         )
 
                 st.markdown("---")
+
+                # Heatmap visualization
+                if heatmap is not None:
+                    st.markdown("<h3>AI Focus Areas</h3>", unsafe_allow_html=True)
+                    st.markdown("<p style='color: #888888; font-size: 0.9rem;'>Heatmap showing which regions the AI analyzed to make its prediction</p>", unsafe_allow_html=True)
+
+                    col1, col2, col3 = st.columns([1, 2, 1])
+                    with col2:
+                        st.image(heatmap, caption="Red areas indicate regions the model focused on", width='stretch')
+
+                    st.markdown("---")
 
                 # Visual features (ABCDE criteria)
                 st.markdown("<h3>Visual Features (ABCDE Criteria)</h3>", unsafe_allow_html=True)

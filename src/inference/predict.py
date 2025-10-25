@@ -18,6 +18,7 @@ from src.model.cnn import create_model
 from src.preprocessing.image_processing import ImagePreprocessor, LesionFeatureExtractor, load_image
 from src.risk_assessment.scorer import LesionRiskScorer, RiskScore
 from src.report.pdf_generator import generate_clinical_report
+from src.visualization.gradcam import generate_gradcam_visualization
 
 
 class LesionPredictor:
@@ -83,15 +84,17 @@ class LesionPredictor:
 
         return model
 
-    def predict_image(self, image_path: str) -> Tuple[np.ndarray, Dict[str, float]]:
+    def predict_image(self, image_path: str, generate_heatmap: bool = True) -> Tuple[np.ndarray, Dict[str, float], Optional[np.ndarray]]:
         """
         Run inference on a single image.
 
         Args:
             image_path: Path to image file
+            generate_heatmap: Whether to generate Grad-CAM heatmap
 
         Returns:
-            Tuple of (predictions, visual_features)
+            Tuple of (predictions, visual_features, heatmap_overlay)
+            heatmap_overlay is None if generate_heatmap=False
         """
         # Preprocess image
         image_tensor = self.preprocessor.preprocess(image_path)
@@ -107,7 +110,23 @@ class LesionPredictor:
         image_array = load_image(image_path)
         visual_features = self.feature_extractor.extract_all_features(image_array)
 
-        return predictions, visual_features
+        # Generate Grad-CAM heatmap
+        heatmap_overlay = None
+        if generate_heatmap:
+            try:
+                predicted_class = np.argmax(predictions)
+                _, heatmap_overlay = generate_gradcam_visualization(
+                    model=self.model,
+                    image_tensor=image_tensor,
+                    original_image=image_array,
+                    target_class=predicted_class,
+                    alpha=0.5
+                )
+            except Exception as e:
+                print(f"Warning: Could not generate heatmap: {e}")
+                heatmap_overlay = None
+
+        return predictions, visual_features, heatmap_overlay
 
     def assess_risk(
         self,
