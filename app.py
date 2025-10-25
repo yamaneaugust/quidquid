@@ -29,7 +29,6 @@ from src.auth.auth_ui import show_login_page, show_user_menu, show_history_page,
 # Page config
 st.set_page_config(
     page_title="Modium - AI-Powered Skin Lesion Pre-Screening",
-    page_icon="🔬",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
@@ -234,6 +233,11 @@ if uploaded_file is not None:
 
     st.markdown("---")
 
+    # Show signup prompt for guests before analysis
+    if not st.session_state.get('authenticated') and not st.session_state.get('dismiss_signup'):
+        show_signup_popup()
+        st.markdown("---")
+
     # Analyze button
     if st.button("ANALYZE", use_container_width=True):
         with st.spinner("Analyzing image..."):
@@ -342,12 +346,6 @@ if uploaded_file is not None:
                         st.info(f"{i}. {rec}")
 
                 st.markdown("---")
-
-                # Show signup prompt for guests (first time only)
-                if not st.session_state.get('authenticated') and not st.session_state.get('signup_prompt_shown'):
-                    show_signup_popup()
-                    st.session_state['signup_prompt_shown'] = True
-                    st.markdown("---")
 
                 # Generate PDF
                 st.markdown("<h3>Download Report</h3>", unsafe_allow_html=True)

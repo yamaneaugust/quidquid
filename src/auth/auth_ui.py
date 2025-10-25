@@ -70,24 +70,25 @@ def show_login_page(db: UserDatabase):
 
 def show_signup_popup():
     """Show a popup encouraging guests to sign up."""
-    st.success("✅ Analysis complete!")
     st.info("""
-    💡 **Create a free account to:**
-    - 📊 Save your analysis history
-    - 📈 Track changes over time
-    - 📥 Access past reports anytime
+    **Create a free account to save your analysis history**
+
+    With an account you can:
+    - Save your analysis history
+    - Track changes over time
+    - Access past reports anytime
 
     It only takes 30 seconds!
     """)
 
     col1, col2 = st.columns(2)
     with col1:
-        if st.button("✨ Create Account", use_container_width=True):
+        if st.button("Create Account", use_container_width=True):
             st.session_state['page'] = 'login'
             st.rerun()
     with col2:
-        if st.button("Maybe Later", use_container_width=True):
-            st.session_state['show_signup_prompt'] = False
+        if st.button("Continue as Guest", use_container_width=True):
+            st.session_state['dismiss_signup'] = True
             st.rerun()
 
 
@@ -95,7 +96,7 @@ def show_user_menu(db: UserDatabase):
     """Display user menu in sidebar."""
 
     with st.sidebar:
-        st.markdown(f"### 👤 {st.session_state.get('username', 'Guest')}")
+        st.markdown(f"### {st.session_state.get('username', 'Guest')}")
 
         if st.session_state.get('authenticated'):
             # Get user stats
@@ -110,11 +111,11 @@ def show_user_menu(db: UserDatabase):
 
             st.markdown("---")
 
-            if st.button("📊 View History", use_container_width=True):
+            if st.button("View History", use_container_width=True):
                 st.session_state['page'] = 'history'
                 st.rerun()
 
-            if st.button("🏠 New Analysis", use_container_width=True):
+            if st.button("New Analysis", use_container_width=True):
                 st.session_state['page'] = 'main'
                 st.rerun()
 
@@ -124,8 +125,8 @@ def show_user_menu(db: UserDatabase):
                 st.session_state.clear()
                 st.rerun()
         else:
-            st.info("💡 Create an account to save your analysis history!")
-            if st.button("📝 Sign Up / Login", use_container_width=True):
+            st.info("Create an account to save your analysis history")
+            if st.button("Sign Up / Login", use_container_width=True):
                 st.session_state['page'] = 'login'
                 st.rerun()
 
@@ -151,7 +152,7 @@ def show_history_page(db: UserDatabase):
     st.markdown("---")
 
     for i, analysis in enumerate(analyses):
-        with st.expander(f"📅 {analysis['timestamp']} - Risk: {analysis['risk_level']}", expanded=(i == 0)):
+        with st.expander(f"{analysis['timestamp']} - Risk: {analysis['risk_level']}", expanded=(i == 0)):
             col1, col2 = st.columns([1, 2])
 
             with col1:
