@@ -61,10 +61,34 @@ def show_login_page(db: UserDatabase):
 
     st.markdown("---")
     st.markdown("<p style='text-align: center; color: #666666; font-size: 0.9rem;'>Or continue without an account (analyses won't be saved)</p>", unsafe_allow_html=True)
-    if st.button("CONTINUE AS GUEST", use_container_width=True):
+    if st.button("← BACK TO APP", use_container_width=True):
         st.session_state['authenticated'] = False
         st.session_state['guest_mode'] = True
+        st.session_state['page'] = 'main'
         st.rerun()
+
+
+def show_signup_popup():
+    """Show a popup encouraging guests to sign up."""
+    st.success("✅ Analysis complete!")
+    st.info("""
+    💡 **Create a free account to:**
+    - 📊 Save your analysis history
+    - 📈 Track changes over time
+    - 📥 Access past reports anytime
+
+    It only takes 30 seconds!
+    """)
+
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("✨ Create Account", use_container_width=True):
+            st.session_state['page'] = 'login'
+            st.rerun()
+    with col2:
+        if st.button("Maybe Later", use_container_width=True):
+            st.session_state['show_signup_prompt'] = False
+            st.rerun()
 
 
 def show_user_menu(db: UserDatabase):
@@ -100,9 +124,9 @@ def show_user_menu(db: UserDatabase):
                 st.session_state.clear()
                 st.rerun()
         else:
-            st.info("You're in guest mode. Analyses won't be saved.")
-            if st.button("Login / Sign Up", use_container_width=True):
-                st.session_state.clear()
+            st.info("💡 Create an account to save your analysis history!")
+            if st.button("📝 Sign Up / Login", use_container_width=True):
+                st.session_state['page'] = 'login'
                 st.rerun()
 
 

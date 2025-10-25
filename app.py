@@ -24,7 +24,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 from src.inference.predict import LesionPredictor
 from src.preprocessing.image_processing import load_image
 from src.auth.user_db import UserDatabase
-from src.auth.auth_ui import show_login_page, show_user_menu, show_history_page
+from src.auth.auth_ui import show_login_page, show_user_menu, show_history_page, show_signup_popup
 
 # Page config
 st.set_page_config(
@@ -131,14 +131,18 @@ def get_database():
 
 db = get_database()
 
-# Initialize session state
+# Initialize session state - default to guest mode
 if 'authenticated' not in st.session_state:
-    st.session_state['authenticated'] = None
+    st.session_state['authenticated'] = False
+if 'guest_mode' not in st.session_state:
+    st.session_state['guest_mode'] = True
 if 'page' not in st.session_state:
     st.session_state['page'] = 'main'
+if 'show_signup_prompt' not in st.session_state:
+    st.session_state['show_signup_prompt'] = False
 
-# Check if user needs to login
-if st.session_state['authenticated'] is None:
+# Handle login page request
+if st.session_state.get('page') == 'login':
     show_login_page(db)
     st.stop()
 
@@ -338,6 +342,12 @@ if uploaded_file is not None:
                         st.info(f"{i}. {rec}")
 
                 st.markdown("---")
+
+                # Show signup prompt for guests (first time only)
+                if not st.session_state.get('authenticated') and not st.session_state.get('signup_prompt_shown'):
+                    show_signup_popup()
+                    st.session_state['signup_prompt_shown'] = True
+                    st.markdown("---")
 
                 # Generate PDF
                 st.markdown("<h3>Download Report</h3>", unsafe_allow_html=True)
