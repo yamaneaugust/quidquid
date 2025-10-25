@@ -14,6 +14,7 @@ from PIL import Image
 import io
 import sys
 import os
+import base64
 from pathlib import Path
 import gdown
 
@@ -22,6 +23,8 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from src.inference.predict import LesionPredictor
 from src.preprocessing.image_processing import load_image
+from src.auth.user_db import UserDatabase
+from src.auth.auth_ui import show_login_page, show_user_menu, show_history_page
 
 # Page config
 st.set_page_config(
@@ -120,6 +123,34 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+# Initialize database
+@st.cache_resource
+def get_database():
+    """Get database instance (cached)."""
+    return UserDatabase()
+
+db = get_database()
+
+# Initialize session state
+if 'authenticated' not in st.session_state:
+    st.session_state['authenticated'] = None
+if 'page' not in st.session_state:
+    st.session_state['page'] = 'main'
+
+# Check if user needs to login
+if st.session_state['authenticated'] is None:
+    show_login_page(db)
+    st.stop()
+
+# Show user menu in sidebar
+if st.session_state.get('authenticated') or st.session_state.get('guest_mode'):
+    show_user_menu(db)
+
+# Route to appropriate page
+if st.session_state.get('page') == 'history':
+    show_history_page(db)
+    st.stop()
+
 # Title
 st.markdown("<p style='text-align: center; font-size: 1.5rem; color: #888888; margin-bottom: 0.5rem; letter-spacing: 8px; font-weight: 300;'>Modium</p>", unsafe_allow_html=True)
 st.markdown("<h1 style='text-align: center; font-size: 3rem; margin-bottom: 0;'>Lesion Pre-Screening</h1>", unsafe_allow_html=True)
@@ -210,6 +241,30 @@ if uploaded_file is not None:
             try:
                 predictions, visual_features = predictor.predict_image(temp_path)
                 risk_score = predictor.assess_risk(predictions, visual_features)
+
+                # Save analysis to database if user is logged in
+                if st.session_state.get('authenticated'):
+                    # Convert image to base64
+                    buffered = io.BytesIO()
+                    image.save(buffered, format="JPEG")
+                    img_str = base64.b64encode(buffered.getvalue()).decode()
+
+                    # Get predicted class
+                    predicted_idx = np.argmax(predictions)
+                    predicted_class = CLASS_NAMES[predicted_idx]
+                    confidence = float(predictions[predicted_idx])
+
+                    # Save to database
+                    db.save_analysis(
+                        user_id=st.session_state['user_id'],
+                        image_base64=img_str,
+                        predicted_class=predicted_class,
+                        confidence=confidence,
+                        risk_score=float(risk_score.overall_score),
+                        risk_level=risk_score.risk_level.value,
+                        visual_features=visual_features,
+                        recommendations=risk_score.recommendations
+                    )
 
                 # Display results
                 st.markdown("<h2 style='text-align: center;'>RISK ASSESSMENT</h2>", unsafe_allow_html=True)
