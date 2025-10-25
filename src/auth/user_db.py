@@ -18,9 +18,17 @@ class UserDatabase:
 
     def __init__(self, db_path: str = "data/users.db"):
         """Initialize database connection."""
-        self.db_path = Path(db_path)
-        self.db_path.parent.mkdir(parents=True, exist_ok=True)
-        self.init_database()
+        try:
+            self.db_path = Path(db_path)
+            self.db_path.parent.mkdir(parents=True, exist_ok=True)
+            self.init_database()
+        except Exception as e:
+            # Fallback to temp directory if data directory not writable
+            import tempfile
+            temp_dir = Path(tempfile.gettempdir()) / "modium_db"
+            temp_dir.mkdir(exist_ok=True)
+            self.db_path = temp_dir / "users.db"
+            self.init_database()
 
     def init_database(self):
         """Create database tables if they don't exist."""

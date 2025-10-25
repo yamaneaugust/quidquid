@@ -30,6 +30,8 @@ def show_login_page(db: UserDatabase):
                         st.session_state['authenticated'] = True
                         st.session_state['user_id'] = user_id
                         st.session_state['username'] = username
+                        st.session_state['guest_mode'] = False
+                        st.session_state['page'] = 'main'
                         st.success(f"Welcome back, {username}!")
                         st.rerun()
                     else:
@@ -54,8 +56,19 @@ def show_login_page(db: UserDatabase):
                 else:
                     success, message = db.create_user(new_username, new_password, new_email)
                     if success:
-                        st.success(message)
-                        st.info("You can now login with your new account!")
+                        # Auto-login after successful signup
+                        success_login, user_id = db.verify_user(new_username, new_password)
+                        if success_login:
+                            st.session_state['authenticated'] = True
+                            st.session_state['user_id'] = user_id
+                            st.session_state['username'] = new_username
+                            st.session_state['guest_mode'] = False
+                            st.session_state['page'] = 'main'
+                            st.success(f"Account created! Welcome, {new_username}!")
+                            st.rerun()
+                        else:
+                            st.success(message)
+                            st.info("You can now login with your new account!")
                     else:
                         st.error(message)
 
