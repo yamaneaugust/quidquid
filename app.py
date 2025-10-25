@@ -24,7 +24,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 from src.inference.predict import LesionPredictor
 from src.preprocessing.image_processing import load_image
 from src.auth.user_db import UserDatabase
-from src.auth.auth_ui import show_login_page, show_user_menu, show_history_page, show_signup_popup
+from src.auth.auth_ui import show_login_page, show_user_menu, show_history_page, show_signup_popup, show_comparison_page
 
 # Page config
 st.set_page_config(
@@ -152,6 +152,10 @@ if st.session_state.get('authenticated') or st.session_state.get('guest_mode'):
 # Route to appropriate page
 if st.session_state.get('page') == 'history':
     show_history_page(db)
+    st.stop()
+
+if st.session_state.get('page') == 'compare':
+    show_comparison_page(db)
     st.stop()
 
 # Title

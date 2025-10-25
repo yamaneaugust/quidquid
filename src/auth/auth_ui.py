@@ -115,6 +115,10 @@ def show_user_menu(db: UserDatabase):
                 st.session_state['page'] = 'history'
                 st.rerun()
 
+            if st.button("Compare Analyses", use_container_width=True):
+                st.session_state['page'] = 'compare'
+                st.rerun()
+
             if st.button("New Analysis", use_container_width=True):
                 st.session_state['page'] = 'main'
                 st.rerun()
@@ -178,3 +182,189 @@ def show_history_page(db: UserDatabase):
                 st.markdown("**Recommendations:**")
                 for rec in analysis['recommendations']:
                     st.markdown(f"- {rec}")
+
+
+def show_comparison_page(db: UserDatabase):
+    """Display comparison page for tracking changes over time."""
+
+    st.markdown("<h2 style='text-align: center;'>Compare Analyses</h2>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: #888888;'>Track changes in your lesions over time</p>", unsafe_allow_html=True)
+    st.markdown("---")
+
+    user_id = st.session_state.get('user_id')
+    if not user_id:
+        st.warning("Please login to compare analyses")
+        return
+
+    analyses = db.get_user_analyses(user_id)
+
+    if len(analyses) < 2:
+        st.info("You need at least 2 analyses to compare. Upload more images to track changes over time!")
+        return
+
+    st.markdown("### Select Analyses to Compare")
+    st.markdown("<p style='color: #888888; font-size: 0.9rem;'>Choose 2-4 analyses to compare side-by-side</p>", unsafe_allow_html=True)
+
+    # Create selection options
+    analysis_options = {}
+    for analysis in analyses:
+        label = f"{analysis['timestamp']} - {analysis['predicted_class'].capitalize()} ({analysis['risk_level']})"
+        analysis_options[label] = analysis
+
+    # Multi-select
+    selected_labels = st.multiselect(
+        "Select analyses",
+        options=list(analysis_options.keys()),
+        max_selections=4,
+        label_visibility="collapsed"
+    )
+
+    if len(selected_labels) < 2:
+        st.info("Please select at least 2 analyses to compare")
+        return
+
+    if st.button("COMPARE SELECTED", use_container_width=True):
+        selected_analyses = [analysis_options[label] for label in selected_labels]
+
+        st.markdown("---")
+        st.markdown("<h3 style='text-align: center;'>Comparison Results</h3>", unsafe_allow_html=True)
+        st.markdown("---")
+
+        # Side-by-side comparison
+        cols = st.columns(len(selected_analyses))
+
+        for i, (col, analysis) in enumerate(zip(cols, selected_analyses)):
+            with col:
+                st.markdown(f"#### Analysis {i+1}")
+                st.markdown(f"**Date:** {analysis['timestamp']}")
+
+                # Display image
+                if analysis['image_data']:
+                    import base64
+                    image_bytes = base64.b64decode(analysis['image_data'])
+                    st.image(image_bytes, use_column_width=True)
+
+                # Risk score
+                risk_colors = {
+                    "Low": "#28a745",
+                    "Moderate": "#ffc107",
+                    "High": "#fd7e14",
+                    "Very High": "#dc3545"
+                }
+                risk_color = risk_colors.get(analysis['risk_level'], "#ffffff")
+
+                st.markdown(f"""
+                <div style='text-align: center; padding: 1rem; background-color: #1a1a1a; border-radius: 4px; margin: 1rem 0;'>
+                    <h2 style='color: {risk_color}; font-size: 2rem; margin: 0;'>{analysis['risk_score']:.0f}</h2>
+                    <p style='color: #888888; font-size: 0.8rem; margin: 0;'>RISK SCORE</p>
+                    <p style='color: {risk_color}; margin-top: 0.5rem; font-size: 0.9rem;'>{analysis['risk_level']}</p>
+                </div>
+                """, unsafe_allow_html=True)
+
+                # Prediction
+                st.markdown(f"**Prediction:** {analysis['predicted_class'].capitalize()}")
+                st.markdown(f"**Confidence:** {analysis['confidence']:.1%}")
+
+        st.markdown("---")
+
+        # Trend analysis
+        st.markdown("### Trend Analysis")
+
+        # Risk score trend
+        risk_scores = [a['risk_score'] for a in selected_analyses]
+        risk_change = risk_scores[-1] - risk_scores[0]
+
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("First Risk Score", f"{risk_scores[0]:.1f}")
+        with col2:
+            st.metric("Latest Risk Score", f"{risk_scores[-1]:.1f}", delta=f"{risk_change:+.1f}")
+        with col3:
+            if risk_change > 10:
+                st.error("**Increasing Risk** - Consult a dermatologist")
+            elif risk_change > 0:
+                st.warning("**Slight Increase** - Monitor closely")
+            elif risk_change < -10:
+                st.success("**Decreasing Risk** - Positive trend")
+            else:
+                st.info("**Stable** - Continue monitoring")
+
+        st.markdown("---")
+
+        # ABCDE criteria comparison
+        st.markdown("### ABCDE Criteria Comparison")
+
+        abcde_keys = ['asymmetry', 'border_irregularity', 'color_variation', 'diameter_score']
+        abcde_labels = {
+            'asymmetry': 'Asymmetry',
+            'border_irregularity': 'Border Irregularity',
+            'color_variation': 'Color Variation',
+            'diameter_score': 'Diameter'
+        }
+
+        for key in abcde_keys:
+            st.markdown(f"**{abcde_labels[key]}:**")
+            cols = st.columns(len(selected_analyses))
+            for i, (col, analysis) in enumerate(zip(cols, selected_analyses)):
+                with col:
+                    value = analysis['visual_features'].get(key, 0)
+                    if value is not None:
+                        st.progress(value, text=f"Analysis {i+1}: {value:.2f}")
+
+        st.markdown("---")
+
+        # Recommendations
+        st.markdown("### Monitoring Recommendations")
+
+        if risk_change > 10:
+            st.error("""
+            **Urgent Attention Required**
+
+            The risk score has increased significantly. This could indicate:
+            - Growth or changes in the lesion
+            - Evolution of concerning features
+
+            **Recommended Action:** Schedule a dermatologist appointment immediately.
+            """)
+        elif risk_change > 5:
+            st.warning("""
+            **Increased Monitoring Recommended**
+
+            The risk score has increased moderately.
+
+            **Recommended Action:**
+            - Take another photo in 2-4 weeks
+            - Schedule dermatologist appointment if changes continue
+            - Document any symptoms (itching, bleeding, etc.)
+            """)
+        elif risk_change < -5:
+            st.success("""
+            **Positive Trend**
+
+            The risk score has decreased.
+
+            **Recommended Action:**
+            - Continue regular monitoring
+            - Maintain current skincare routine
+            - Take another photo in 3-6 months
+            """)
+        else:
+            st.info("""
+            **Stable Lesion**
+
+            The risk score has remained relatively stable.
+
+            **Recommended Action:**
+            - Continue routine monitoring
+            - Take another photo in 3 months
+            - Watch for any sudden changes
+            """)
+
+        st.markdown("---")
+        st.error("""
+        **Medical Disclaimer**
+
+        This comparison tool is for educational and documentation purposes only.
+        It is NOT a substitute for professional medical diagnosis.
+        Always consult a qualified dermatologist for medical decisions.
+        """)
