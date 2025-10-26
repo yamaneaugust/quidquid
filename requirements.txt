@@ -50,3 +50,6 @@ gdown>=4.7.0
 # Authentication and user management
 streamlit-authenticator>=0.2.3
 extra-streamlit-components>=0.1.56
+
+# Analytics
+streamlit-analytics>=0.4.1

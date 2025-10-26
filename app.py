@@ -26,6 +26,13 @@ from src.preprocessing.image_processing import load_image
 from src.auth.user_db import UserDatabase
 from src.auth.auth_ui import show_login_page, show_user_menu, show_history_page, show_signup_popup, show_comparison_page
 
+# Analytics
+try:
+    import streamlit_analytics
+    streamlit_analytics.start_tracking()
+except:
+    pass  # Analytics optional
+
 # Page config
 st.set_page_config(
     page_title="Modium - AI-Powered Skin Lesion Pre-Screening",
@@ -419,3 +426,9 @@ st.markdown("""
     <p>Always seek professional medical advice</p>
 </div>
 """, unsafe_allow_html=True)
+
+# Stop analytics tracking
+try:
+    streamlit_analytics.stop_tracking()
+except:
+    pass
