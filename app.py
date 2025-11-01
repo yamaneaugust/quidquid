@@ -53,7 +53,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Google Analytics
-GA_TRACKING_ID = "G-XXXXXXXXXX"  # Replace with your actual tracking ID
+GA_TRACKING_ID = "G-HGN9QGK62H"
 st.markdown(f"""
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id={GA_TRACKING_ID}"></script>
