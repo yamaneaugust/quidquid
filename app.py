@@ -274,6 +274,15 @@ if uploaded_file is not None:
                 predictions, visual_features, heatmap = predictor.predict_image(temp_path)
                 risk_score = predictor.assess_risk(predictions, visual_features)
 
+                # Check if this is likely not a lesion
+                max_confidence = float(np.max(predictions))
+                confidence_spread = float(np.max(predictions) - np.min(predictions))
+
+                # Flag as "not a lesion" if:
+                # 1. Maximum confidence is below 50% (model is very uncertain)
+                # 2. All predictions are similar (spread < 0.2 means roughly equal)
+                is_likely_not_lesion = max_confidence < 0.50 or confidence_spread < 0.20
+
                 # Save analysis to database if user is logged in
                 if st.session_state.get('authenticated'):
                     # Convert image to base64
@@ -301,6 +310,25 @@ if uploaded_file is not None:
                 # Display results
                 st.markdown("<h2 style='text-align: center;'>RISK ASSESSMENT</h2>", unsafe_allow_html=True)
 
+                # Warning if not a lesion
+                if is_likely_not_lesion:
+                    st.error("""
+                    ⚠️ **WARNING: This may not be a skin lesion**
+
+                    The AI model is highly uncertain about this image, suggesting it may not be a skin lesion at all.
+
+                    **Common causes:**
+                    - Non-skin images (text, objects, etc.)
+                    - Poor image quality or lighting
+                    - Images taken from too far away
+                    - Non-lesion skin features
+
+                    **Please upload a clear, close-up photo of an actual skin lesion for accurate analysis.**
+
+                    The analysis below should NOT be trusted for this image.
+                    """)
+                    st.markdown("---")
+
                 # Risk level with color
                 risk_colors = {
                     "Low": "#28a745",
@@ -320,6 +348,9 @@ if uploaded_file is not None:
 
                 # Metrics
                 st.markdown("<h3>Model Predictions</h3>", unsafe_allow_html=True)
+
+                if is_likely_not_lesion:
+                    st.markdown("<p style='color: #ff4444;'>⚠️ Model confidence is extremely low - these predictions are unreliable</p>", unsafe_allow_html=True)
 
                 cols = st.columns(3)
                 for i, (class_name, prob) in enumerate(zip(CLASS_NAMES, predictions)):
