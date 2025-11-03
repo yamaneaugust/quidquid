@@ -70,18 +70,33 @@ class LesionPredictor:
 
     def _load_model(self, model_path: str) -> torch.nn.Module:
         """Load trained model from checkpoint."""
-        # Create model architecture
-        model = create_model(model_type='cnn', num_classes=self.num_classes)
-
-        # Load checkpoint
+        # Load checkpoint first to determine model type
         checkpoint = torch.load(model_path, map_location=self.device)
 
-        # Load state dict
-        if 'model_state_dict' in checkpoint:
-            model.load_state_dict(checkpoint['model_state_dict'])
-        else:
-            model.load_state_dict(checkpoint)
+        # Try to load as ResNet first (new model), fallback to CNN (old model)
+        model_type = 'resnet'  # Default to ResNet50 (current production model)
 
+        try:
+            # Create model architecture
+            model = create_model(model_type=model_type, num_classes=self.num_classes)
+
+            # Load state dict
+            if 'model_state_dict' in checkpoint:
+                model.load_state_dict(checkpoint['model_state_dict'])
+            else:
+                model.load_state_dict(checkpoint)
+        except Exception as e:
+            # If ResNet fails, try loading as CNN (backward compatibility)
+            print(f"Failed to load as ResNet, trying CNN: {e}")
+            model_type = 'cnn'
+            model = create_model(model_type=model_type, num_classes=self.num_classes)
+
+            if 'model_state_dict' in checkpoint:
+                model.load_state_dict(checkpoint['model_state_dict'])
+            else:
+                model.load_state_dict(checkpoint)
+
+        print(f"Model loaded successfully as {model_type}")
         return model
 
     def predict_image(self, image_path: str, generate_heatmap: bool = True) -> Tuple[np.ndarray, Dict[str, float], Optional[np.ndarray]]:

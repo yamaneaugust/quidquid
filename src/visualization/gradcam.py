@@ -162,7 +162,7 @@ def generate_gradcam_visualization(
     Generate Grad-CAM visualization.
 
     Args:
-        model: CNN model
+        model: CNN model (LesionCNN or LesionResNet)
         image_tensor: Preprocessed image tensor (1, C, H, W)
         original_image: Original image array (H, W, 3) in range [0, 255]
         target_class: Target class to visualize (None = predicted class)
@@ -172,13 +172,21 @@ def generate_gradcam_visualization(
         Tuple of (heatmap, overlaid_image)
     """
     # Get the last convolutional layer
-    # For LesionCNN, it's conv8 (the last conv layer before fc)
+    # Different architectures have different layer names
     target_layer = None
-    for name, module in model.named_modules():
-        if 'conv8' in name or (isinstance(module, torch.nn.Conv2d) and 'conv' in name):
-            target_layer = module
 
-    # If conv8 not found, use the last conv layer
+    # Check if it's a ResNet (has 'backbone' attribute)
+    if hasattr(model, 'backbone'):
+        # ResNet50 - use layer4 (last residual block)
+        if hasattr(model.backbone, 'layer4'):
+            target_layer = model.backbone.layer4[-1]
+    else:
+        # LesionCNN - look for conv8 or use last conv layer
+        for name, module in model.named_modules():
+            if 'conv8' in name or (isinstance(module, torch.nn.Conv2d) and 'conv' in name):
+                target_layer = module
+
+    # Fallback: find the last conv layer in the entire model
     if target_layer is None:
         conv_layers = [m for m in model.modules() if isinstance(m, torch.nn.Conv2d)]
         if conv_layers:
