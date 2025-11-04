@@ -265,9 +265,15 @@ if uploaded_file is not None:
     # Analyze button
     if st.button("ANALYZE", use_container_width=True):
         with st.spinner("Analyzing image..."):
-            # Save temp file
+            # Save temp file - convert RGBA to RGB if needed (PNG with transparency)
             temp_path = "temp_upload.jpg"
-            image.save(temp_path)
+            if image.mode == 'RGBA':
+                # Convert RGBA to RGB (remove alpha channel)
+                rgb_image = Image.new('RGB', image.size, (255, 255, 255))
+                rgb_image.paste(image, mask=image.split()[3])  # Use alpha as mask
+                rgb_image.save(temp_path)
+            else:
+                image.save(temp_path)
 
             # Run prediction
             try:
