@@ -20,6 +20,7 @@ from tqdm import tqdm
 
 from src.model.cnn import create_model
 from src.preprocessing.image_processing import ImagePreprocessor
+from collections import Counter
 
 
 class LesionDataset(Dataset):
@@ -76,6 +77,110 @@ class LesionDataset(Dataset):
             image = torch.from_numpy(np.array(image)).permute(2, 0, 1).float() / 255.0
 
         return image, label
+
+
+def calculate_class_weights(
+    dataset: LesionDataset,
+    method: str = 'balanced',
+    device: str = 'cpu'
+) -> Optional[torch.Tensor]:
+    """
+    Calculate class weights for handling imbalanced datasets.
+
+    Args:
+        dataset: LesionDataset instance
+        method: 'balanced' (inverse frequency) or 'effective' (effective number of samples)
+        device: Device to place tensor on
+
+    Returns:
+        Tensor of class weights, or None if balanced weighting not needed
+    """
+    # Count samples per class
+    labels = [label for _, label in dataset.samples]
+    class_counts = Counter(labels)
+    num_classes = len(class_counts)
+
+    # Get counts in order
+    counts = np.array([class_counts[i] for i in range(num_classes)])
+    total_samples = np.sum(counts)
+
+    print(f"\n📊 Class distribution:")
+    for i, class_name in enumerate(dataset.classes):
+        count = counts[i]
+        percentage = 100 * count / total_samples
+        print(f"  {class_name:15s}: {count:5d} samples ({percentage:5.2f}%)")
+
+    if method == 'balanced':
+        # Inverse frequency weighting: weight_i = total / (num_classes * count_i)
+        weights = total_samples / (num_classes * counts)
+    elif method == 'effective':
+        # Effective number of samples (from Class-Balanced Loss paper)
+        # More aggressive weighting for severe imbalance
+        beta = 0.9999
+        effective_num = 1.0 - np.power(beta, counts)
+        weights = (1.0 - beta) / effective_num
+        weights = weights / np.sum(weights) * num_classes
+    elif method == 'none':
+        return None
+    else:
+        raise ValueError(f"Unknown weighting method: {method}")
+
+    print(f"\n⚖️  Class weights ({method}):")
+    for i, class_name in enumerate(dataset.classes):
+        print(f"  {class_name:15s}: {weights[i]:.4f}")
+
+    return torch.FloatTensor(weights).to(device)
+
+
+class FocalLoss(nn.Module):
+    """
+    Focal Loss for addressing class imbalance.
+
+    Focal Loss down-weights easy examples and focuses on hard examples.
+    Useful when there's severe class imbalance.
+
+    Reference: Lin et al., "Focal Loss for Dense Object Detection" (2017)
+    https://arxiv.org/abs/1708.02002
+    """
+
+    def __init__(self, alpha: float = 0.25, gamma: float = 2.0, reduction: str = 'mean'):
+        """
+        Args:
+            alpha: Weighting factor in [0, 1] to balance positive/negative examples
+            gamma: Focusing parameter for modulating loss (gamma >= 0)
+            reduction: 'none' | 'mean' | 'sum'
+        """
+        super(FocalLoss, self).__init__()
+        self.alpha = alpha
+        self.gamma = gamma
+        self.reduction = reduction
+
+    def forward(self, inputs: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
+        """
+        Args:
+            inputs: (N, C) where C = number of classes (raw logits)
+            targets: (N,) where each value is 0 <= targets[i] <= C-1
+
+        Returns:
+            Scalar loss value
+        """
+        # Get softmax probabilities
+        p = torch.softmax(inputs, dim=1)
+
+        # Get class probabilities for the target class
+        ce_loss = nn.functional.cross_entropy(inputs, targets, reduction='none')
+        p_t = p.gather(1, targets.unsqueeze(1)).squeeze(1)
+
+        # Calculate focal loss
+        focal_weight = (1 - p_t) ** self.gamma
+        focal_loss = self.alpha * focal_weight * ce_loss
+
+        if self.reduction == 'mean':
+            return focal_loss.mean()
+        elif self.reduction == 'sum':
+            return focal_loss.sum()
+        else:
+            return focal_loss
 
 
 class Trainer:
@@ -253,6 +358,11 @@ def main():
     parser.add_argument('--num-classes', type=int, default=None, help='Number of classes (auto-detected if not specified)')
     parser.add_argument('--device', type=str, default='cuda' if torch.cuda.is_available() else 'cpu', help='Device to use')
     parser.add_argument('--save-dir', type=str, default='data/models', help='Directory to save models')
+    parser.add_argument('--class-weights', type=str, default='none', choices=['none', 'balanced', 'effective'],
+                        help='Class weighting method for imbalanced data (none, balanced, or effective)')
+    parser.add_argument('--focal-loss', action='store_true', help='Use focal loss instead of cross-entropy (good for imbalanced data)')
+    parser.add_argument('--focal-alpha', type=float, default=0.25, help='Focal loss alpha parameter (weight for positive class)')
+    parser.add_argument('--focal-gamma', type=float, default=2.0, help='Focal loss gamma parameter (focusing parameter)')
 
     args = parser.parse_args()
 
@@ -265,6 +375,9 @@ def main():
     print(f"Epochs: {args.epochs}")
     print(f"Batch size: {args.batch_size}")
     print(f"Learning rate: {args.lr}")
+    print(f"Class weighting: {args.class_weights}")
+    if args.focal_loss:
+        print(f"Focal loss: enabled (alpha={args.focal_alpha}, gamma={args.focal_gamma})")
     print("=" * 60)
 
     # Create preprocessor with augmentation
@@ -294,8 +407,24 @@ def main():
     model = create_model(model_type=args.model_type, num_classes=num_classes)
     print(f"\nModel created with {sum(p.numel() for p in model.parameters())} parameters")
 
-    # Loss and optimizer
-    criterion = nn.CrossEntropyLoss()
+    # Calculate class weights if requested
+    class_weights = None
+    if args.class_weights != 'none':
+        class_weights = calculate_class_weights(dataset, method=args.class_weights, device=args.device)
+
+    # Loss function
+    if args.focal_loss:
+        print(f"\n🎯 Using Focal Loss (alpha={args.focal_alpha}, gamma={args.focal_gamma})")
+        criterion = FocalLoss(alpha=args.focal_alpha, gamma=args.focal_gamma)
+    else:
+        if class_weights is not None:
+            print(f"\n⚖️  Using weighted CrossEntropyLoss")
+            criterion = nn.CrossEntropyLoss(weight=class_weights)
+        else:
+            print(f"\n📊 Using standard CrossEntropyLoss (no class weighting)")
+            criterion = nn.CrossEntropyLoss()
+
+    # Optimizer
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
 
     # Create trainer
