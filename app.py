@@ -140,19 +140,41 @@ st.markdown("""
         padding-bottom: 2rem;
     }
 
-    /* Hide Streamlit branding and manage app button */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
+    /* Hide Streamlit branding and manage app button - comprehensive approach */
+    #MainMenu {visibility: hidden !important;}
+    footer {visibility: hidden !important;}
+    header {visibility: hidden !important;}
 
-    /* Hide the manage app button specifically */
+    /* Hide manage app button - multiple selectors for different Streamlit versions */
     [data-testid="manage-app-button"] {
-        display: none;
+        display: none !important;
     }
 
-    /* Hide hamburger menu */
+    [data-testid="stToolbar"] {
+        display: none !important;
+    }
+
+    .stActionButton {
+        display: none !important;
+    }
+
+    /* Hide hamburger menu and header buttons */
     button[kind="header"] {
-        display: none;
+        display: none !important;
+    }
+
+    /* Additional selectors to catch all toolbar elements */
+    div[data-testid="stToolbar"] {
+        display: none !important;
+    }
+
+    section[data-testid="stSidebar"] > div:first-child {
+        margin-top: -3.5rem;
+    }
+
+    /* Hide the three-dot menu if it appears */
+    button[title="View app menu"] {
+        display: none !important;
     }
 </style>
 """, unsafe_allow_html=True)
