@@ -139,6 +139,21 @@ st.markdown("""
         padding-top: 2rem;
         padding-bottom: 2rem;
     }
+
+    /* Hide Streamlit branding and manage app button */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+
+    /* Hide the manage app button specifically */
+    [data-testid="manage-app-button"] {
+        display: none;
+    }
+
+    /* Hide hamburger menu */
+    button[kind="header"] {
+        display: none;
+    }
 </style>
 """, unsafe_allow_html=True)
 
