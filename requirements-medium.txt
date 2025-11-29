@@ -1,0 +1,44 @@
+# Production requirements - optimized for Railway deployment
+# Removed: tensorflow, keras, jupyter (not needed in production)
+
+# Core ML/DL frameworks (PyTorch only - no TensorFlow needed)
+torch>=2.0.0
+torchvision>=0.15.0
+
+# Image processing
+Pillow>=10.0.0
+opencv-python-headless>=4.8.0
+scikit-image>=0.21.0
+
+# Data handling
+numpy>=1.24.0
+pandas>=2.0.0
+scikit-learn>=1.3.0
+
+# Visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# PDF generation
+reportlab>=4.0.0
+fpdf2>=2.7.0
+
+# Model interpretation
+grad-cam>=1.4.0
+
+# Progress bars and utilities
+tqdm>=4.65.0
+pyyaml>=6.0
+
+# Web framework
+streamlit>=1.28.0
+
+# Cloud storage for model download
+gdown>=4.7.0
+
+# Authentication and user management
+streamlit-authenticator>=0.2.3
+extra-streamlit-components>=0.1.56
+
+# Analytics (optional - comment out if not needed)
+streamlit-analytics>=0.4.1

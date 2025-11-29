@@ -1,0 +1,62 @@
+# Ignore files to speed up Railway builds
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+
+# Jupyter
+*.ipynb
+.ipynb_checkpoints/
+
+# Data files (large)
+data/raw/
+data/processed/
+*.csv
+*.h5
+*.pkl
+*.pickle
+
+# Documentation
+*.md
+docs/
+reports/
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+tests/
+*.pytest_cache/
+.coverage
+htmlcov/
+
+# Notebooks and scripts not needed in production
+notebooks/
+scripts/
+experiments/
+
+# Model files (will be downloaded at runtime)
+# data/models/*.pth
+
+# Requirements files not being used
+requirements-full.txt
+requirements-production.txt
+requirements-minimal.txt
