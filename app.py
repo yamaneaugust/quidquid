@@ -176,6 +176,34 @@ st.markdown("""
     button[title="View app menu"] {
         display: none !important;
     }
+
+    /* Hide GitHub link/icon in header */
+    a[href*="github.com"] {
+        display: none !important;
+    }
+
+    /* Hide "Deploy" and "View source code" buttons */
+    button[title*="GitHub"] {
+        display: none !important;
+    }
+
+    button[title*="View source"] {
+        display: none !important;
+    }
+
+    /* Hide any links in the app header */
+    header a {
+        display: none !important;
+    }
+
+    /* Additional GitHub icon selectors */
+    svg[class*="github"] {
+        display: none !important;
+    }
+
+    [data-testid="stHeader"] a {
+        display: none !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
