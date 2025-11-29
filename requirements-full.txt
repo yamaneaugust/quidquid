@@ -1,7 +1,6 @@
-# Production requirements - optimized for Railway deployment
-# Removed: tensorflow, keras, jupyter (not needed in production)
-
-# Core ML/DL frameworks (PyTorch only - no TensorFlow needed)
+# Core ML/DL frameworks
+tensorflow>=2.13.0
+keras>=2.13.0
 torch>=2.0.0
 torchvision>=0.15.0
 
@@ -30,8 +29,20 @@ grad-cam>=1.4.0
 tqdm>=4.65.0
 pyyaml>=6.0
 
-# Web framework
+# Medical imaging (optional but recommended)
+pydicom>=2.4.0
+
+# Jupyter for notebooks
+jupyter>=1.0.0
+ipykernel>=6.25.0
+
+# Testing
+pytest>=7.4.0
+pytest-cov>=4.1.0
+
+# Web frameworks
 streamlit>=1.28.0
+flask>=3.0.0
 
 # Cloud storage for model download
 gdown>=4.7.0
@@ -40,5 +51,5 @@ gdown>=4.7.0
 streamlit-authenticator>=0.2.3
 extra-streamlit-components>=0.1.56
 
-# Analytics (optional - comment out if not needed)
+# Analytics
 streamlit-analytics>=0.4.1
