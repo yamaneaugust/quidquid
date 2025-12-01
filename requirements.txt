@@ -1,27 +1,27 @@
 # Ultra-lightweight production requirements for Railway
-# Minimal dependencies for Streamlit + PyTorch app
+# Optimized for Python 3.11 compatibility
 
 # Core ML framework (PyTorch only)
-torch==2.5.1
-torchvision==0.20.1
+torch>=2.0.0,<3.0.0
+torchvision>=0.15.0,<1.0.0
 
 # Image processing (minimal)
-Pillow==10.0.0
-opencv-python-headless==4.8.1.78
+Pillow>=10.0.0
+opencv-python-headless>=4.8.0
 
-# Essential data handling
-numpy==1.24.3
-pandas==2.0.3
+# Essential data handling (flexible versions for Python 3.11)
+numpy>=1.24.0,<2.0.0
+pandas>=2.0.0
 
 # Streamlit and web
-streamlit==1.28.0
+streamlit>=1.28.0
 
 # Model download
-gdown==4.7.1
+gdown>=4.7.0
 
 # Authentication (simplified)
-streamlit-authenticator==0.2.3
-extra-streamlit-components==0.1.60
+streamlit-authenticator>=0.2.0
+extra-streamlit-components>=0.1.0
 
 # Utilities
-pyyaml==6.0.1
+pyyaml>=6.0
