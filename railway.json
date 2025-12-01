@@ -5,12 +5,23 @@
     "nixpacksPlan": {
       "phases": {
         "setup": {
-          "nixPkgs": ["python311", "gcc"]
+          "nixPkgs": [
+            "python311",
+            "gcc",
+            "glib",
+            "libGL",
+            "libglvnd"
+          ],
+          "nixLibs": [
+            "glib",
+            "libGL",
+            "libglvnd"
+          ]
         },
         "install": {
           "cmds": [
             "python3.11 -m venv --copies /opt/venv",
-            ". /opt/venv/bin/activate && pip install --upgrade pip",
+            ". /opt/venv/bin/activate && pip install --upgrade pip setuptools wheel",
             ". /opt/venv/bin/activate && pip install -r requirements.txt"
           ]
         }
@@ -19,7 +30,7 @@
   },
   "deploy": {
     "startCommand": "streamlit run app.py --server.port=$PORT --server.address=0.0.0.0 --server.headless=true",
-    "healthcheckPath": "/",
+    "healthcheckPath": "/_stcore/health",
     "healthcheckTimeout": 100
   }
 }
