@@ -1,17 +1,20 @@
 # Ultra-lightweight production requirements for Railway
 # Optimized for Python 3.11 compatibility
+# OpenCV removed to avoid system dependency issues
 
 # Core ML framework (PyTorch only)
 torch>=2.0.0,<3.0.0
 torchvision>=0.15.0,<1.0.0
 
-# Image processing (minimal)
+# Image processing (Pillow only - no OpenCV!)
 Pillow>=10.0.0
-opencv-python-headless>=4.8.0
 
-# Essential data handling (flexible versions for Python 3.11)
+# Essential data handling
 numpy>=1.24.0,<2.0.0
 pandas>=2.0.0
+
+# Visualization (for GradCAM colormaps)
+matplotlib>=3.7.0
 
 # Streamlit and web
 streamlit>=1.28.0
@@ -19,7 +22,7 @@ streamlit>=1.28.0
 # Model download
 gdown>=4.7.0
 
-# Authentication (simplified)
+# Authentication
 streamlit-authenticator>=0.2.0
 extra-streamlit-components>=0.1.0
 

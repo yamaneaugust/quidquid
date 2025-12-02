@@ -7,9 +7,10 @@ Generates heatmaps showing which regions of the image the model focuses on.
 import torch
 import torch.nn.functional as F
 import numpy as np
-import cv2
+# import cv2  # Commented out - causes deployment issues with system dependencies
 from typing import Tuple, Optional
 from PIL import Image
+import matplotlib.cm as cm
 
 
 class GradCAM:
@@ -94,7 +95,7 @@ class GradCAM:
         self,
         input_tensor: torch.Tensor,
         target_class: Optional[int] = None,
-        colormap: int = cv2.COLORMAP_JET
+        colormap: str = 'jet'
     ) -> np.ndarray:
         """
         Generate colored heatmap.
@@ -102,7 +103,7 @@ class GradCAM:
         Args:
             input_tensor: Input image tensor
             target_class: Target class to visualize
-            colormap: OpenCV colormap to use
+            colormap: Matplotlib colormap to use (default: 'jet')
 
         Returns:
             Colored heatmap (H, W, 3) in range [0, 255]
@@ -110,13 +111,16 @@ class GradCAM:
         # Get CAM
         cam = self.generate_cam(input_tensor, target_class)
 
-        # Resize to input size
+        # Resize to input size using PIL
         input_size = input_tensor.shape[2:]
-        cam_resized = cv2.resize(cam, (input_size[1], input_size[0]))
+        cam_pil = Image.fromarray(np.uint8(255 * cam))
+        cam_resized = cam_pil.resize((input_size[1], input_size[0]), Image.LANCZOS)
+        cam_resized = np.array(cam_resized) / 255.0
 
-        # Convert to heatmap
-        heatmap = np.uint8(255 * cam_resized)
-        heatmap = cv2.applyColorMap(heatmap, colormap)
+        # Apply colormap using matplotlib
+        cmap = cm.get_cmap(colormap)
+        heatmap = cmap(cam_resized)[:, :, :3]  # Remove alpha channel
+        heatmap = np.uint8(255 * heatmap)
 
         return heatmap
 
@@ -137,16 +141,18 @@ class GradCAM:
         Returns:
             Overlaid image (H, W, 3)
         """
-        # Ensure same size
+        # Ensure same size using PIL
         if image.shape[:2] != heatmap.shape[:2]:
-            heatmap = cv2.resize(heatmap, (image.shape[1], image.shape[0]))
+            heatmap_pil = Image.fromarray(heatmap)
+            heatmap_pil = heatmap_pil.resize((image.shape[1], image.shape[0]), Image.LANCZOS)
+            heatmap = np.array(heatmap_pil)
 
         # Ensure uint8
         image = np.uint8(image)
         heatmap = np.uint8(heatmap)
 
-        # Overlay
-        overlaid = cv2.addWeighted(image, 1 - alpha, heatmap, alpha, 0)
+        # Overlay using numpy (equivalent to cv2.addWeighted)
+        overlaid = np.uint8((1 - alpha) * image + alpha * heatmap)
 
         return overlaid
 
@@ -200,18 +206,17 @@ def generate_gradcam_visualization(
     # Generate heatmap
     heatmap = gradcam.generate_heatmap(image_tensor, target_class)
 
-    # Resize original image to match input size if needed
+    # Resize original image to match input size if needed using PIL
     input_size = (image_tensor.shape[3], image_tensor.shape[2])  # (W, H)
     if original_image.shape[:2] != input_size[::-1]:
-        original_resized = cv2.resize(original_image, input_size)
+        original_pil = Image.fromarray(original_image)
+        original_pil = original_pil.resize(input_size, Image.LANCZOS)
+        original_resized = np.array(original_pil)
     else:
         original_resized = original_image
 
     # Overlay
     overlaid = gradcam.overlay_heatmap(original_resized, heatmap, alpha)
 
-    # Convert from BGR to RGB for display
-    heatmap_rgb = cv2.cvtColor(heatmap, cv2.COLOR_BGR2RGB)
-    overlaid_rgb = cv2.cvtColor(overlaid, cv2.COLOR_BGR2RGB)
-
-    return heatmap_rgb, overlaid_rgb
+    # Heatmap and overlaid are already in RGB format (matplotlib colormap output)
+    return heatmap, overlaid
