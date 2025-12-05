@@ -17,6 +17,6 @@ aptPkgs = [
 
 [phases.install]
 cmds = [
-    "pip uninstall -y opencv-python opencv-contrib-python || true",
-    "pip install opencv-python-headless --force-reinstall"
+    "chmod +x setup.sh",
+    "bash setup.sh"
 ]
