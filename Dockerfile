@@ -1,21 +1,19 @@
-# Use Python 3.11 slim image
-FROM python:3.11-slim
+# Use Python 3.11 slim image based on Debian Bookworm (stable)
+# Bookworm still has libgl1-mesa-glx available, unlike Trixie
+FROM python:3.11-slim-bookworm
 
 # Set working directory
 WORKDIR /app
 
 # Install system dependencies for OpenCV and other image processing libraries
-# Note: libgl1-mesa-glx is replaced by libgl1-mesa-dri in Debian Trixie
+# Using Bookworm which still has libgl1-mesa-glx available
 RUN apt-get update && apt-get install -y \
-    libgl1-mesa-dri \
-    libgl1 \
+    libgl1-mesa-glx \
     libglib2.0-0 \
     libsm6 \
     libxext6 \
     libxrender-dev \
     libgomp1 \
-    libglx-mesa0 \
-    libglx0 \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first for better caching
