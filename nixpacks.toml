@@ -1,6 +1,19 @@
 # Nixpacks configuration for Railway
+[providers]
+apt = true
+
 [phases.setup]
-nixPkgs = ["libGL"]
+aptPkgs = [
+    "libgl1-mesa-dri",
+    "libgl1",
+    "libglx-mesa0",
+    "libglx0",
+    "libglib2.0-0",
+    "libsm6",
+    "libxext6",
+    "libxrender-dev",
+    "libgomp1"
+]
 
 [phases.install]
 cmds = [
