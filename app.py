@@ -509,6 +509,17 @@ else:
     </div>
     """, unsafe_allow_html=True)
 
+# Social connect
+st.markdown("""
+<div style='text-align: center; padding: 2rem 0;'>
+    <p style='color: #999999; font-size: 0.9rem;'>
+        Connect: <a href='https://x.com/august_yamane' target='_blank' style='color: #999999; text-decoration: none; transition: color 0.3s;'>
+            <span style='font-weight: 600;'>𝕏</span> @august_yamane
+        </a>
+    </p>
+</div>
+""", unsafe_allow_html=True)
+
 # Footer
 st.markdown("---")
 st.markdown("""
