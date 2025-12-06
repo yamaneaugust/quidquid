@@ -41,15 +41,15 @@ pytest>=7.4.0
 pytest-cov>=4.1.0
 
 # Web frameworks
-streamlit>=1.28.0
+streamlit>=1.30.0
 flask>=3.0.0
 
 # Cloud storage for model download
 gdown>=4.7.0
 
 # Authentication and user management
-streamlit-authenticator>=0.2.3
-extra-streamlit-components>=0.1.56
+streamlit-authenticator>=0.3.2
+extra-streamlit-components>=0.1.71
 
 # Analytics
 streamlit-analytics>=0.4.1
