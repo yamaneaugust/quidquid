@@ -513,6 +513,7 @@ else:
 st.markdown("---")
 st.markdown("""
 <div style='text-align: center; color: #666666; font-size: 0.8rem; padding: 2rem 0;'>
+    <p>© 2025 modium</p>
     <p>Lesion Pre-Screening CNN System v0.1.0</p>
     <p>For educational and research purposes only</p>
     <p>Always seek professional medical advice</p>
