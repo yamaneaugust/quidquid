@@ -68,17 +68,24 @@ st.markdown(f"""
 
 # Custom CSS for black minimalist theme
 st.markdown("""
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
+    /* Apply Noto Sans globally */
+    * {
+        font-family: 'Noto Sans', sans-serif;
+    }
+
     /* Main background */
     .stApp {
         background-color: #000000;
         color: #ffffff;
+        font-family: 'Noto Sans', sans-serif;
     }
 
     /* Headers */
     h1, h2, h3 {
         color: #ffffff !important;
-        font-family: 'Helvetica Neue', sans-serif;
+        font-family: 'Noto Sans', sans-serif;
         font-weight: 300;
     }
 
@@ -97,6 +104,7 @@ st.markdown("""
         font-weight: 500;
         padding: 0.5rem 2rem;
         transition: all 0.3s;
+        font-family: 'Noto Sans', sans-serif;
     }
 
     .stButton>button:hover {
@@ -109,11 +117,13 @@ st.markdown("""
         background-color: #1a1a1a;
         border: 1px solid #ff4444;
         color: #ffffff;
+        font-family: 'Noto Sans', sans-serif;
     }
 
     /* Metrics */
     [data-testid="stMetricValue"] {
         color: #ffffff;
+        font-family: 'Noto Sans', sans-serif;
     }
 
     /* Divider */
@@ -124,6 +134,7 @@ st.markdown("""
     /* Text */
     p, li, span {
         color: #cccccc;
+        font-family: 'Noto Sans', sans-serif;
     }
 
     /* Download button */
@@ -133,6 +144,7 @@ st.markdown("""
         border: none;
         border-radius: 2px;
         font-weight: 500;
+        font-family: 'Noto Sans', sans-serif;
     }
 
     /* Remove padding */
@@ -298,7 +310,7 @@ if uploaded_file is not None:
                 """)
 
                 # Show validation metrics for debugging (optional)
-                with st.expander("📊 Technical Details"):
+                with st.expander("Technical Details"):
                     st.json(validation_metrics)
 
                 # Skip model prediction entirely
