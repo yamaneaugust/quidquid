@@ -23,6 +23,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from src.inference.predict import LesionPredictor
 from src.preprocessing.image_processing import load_image
+from src.preprocessing.skin_validator import SkinLesionValidator
 from src.auth.user_db import UserDatabase
 from src.auth.auth_ui import show_login_page, show_user_menu, show_history_page, show_signup_popup, show_comparison_page
 
@@ -236,6 +237,9 @@ if predictor is None:
     st.error("Failed to load model. Please check the model file.")
     st.stop()
 
+# Initialize skin validator
+skin_validator = SkinLesionValidator()
+
 st.markdown("---")
 
 # File upload
@@ -275,12 +279,38 @@ if uploaded_file is not None:
             else:
                 image.save(temp_path)
 
+            # Validate image is a skin lesion BEFORE running model
+            is_valid_skin, validation_reason, validation_metrics = skin_validator.validate_image(temp_path)
+
+            if not is_valid_skin:
+                # Reject non-skin images immediately
+                st.error(f"""
+                ⚠️ **NOT A SKIN LESION IMAGE**
+
+                {validation_reason}
+
+                **This image appears to be:**
+                - Text or document (Latin homework, screenshots, etc.)
+                - Non-skin photograph (objects, scenery, etc.)
+                - Poor quality or unsuitable for analysis
+
+                **Please upload a clear, close-up photo of an actual skin lesion.**
+                """)
+
+                # Show validation metrics for debugging (optional)
+                with st.expander("📊 Technical Details"):
+                    st.json(validation_metrics)
+
+                # Skip model prediction entirely
+                os.remove(temp_path)
+                st.stop()
+
             # Run prediction
             try:
                 predictions, visual_features, heatmap = predictor.predict_image(temp_path)
                 risk_score = predictor.assess_risk(predictions, visual_features)
 
-                # Check if this is likely not a lesion
+                # Check if this is likely not a lesion (secondary check)
                 max_confidence = float(np.max(predictions))
                 confidence_spread = float(np.max(predictions) - np.min(predictions))
 
