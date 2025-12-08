@@ -43,14 +43,48 @@ st.set_page_config(
 
 # SEO Meta Tags for Google indexing
 st.markdown("""
-<meta name="description" content="Modium - AI-powered skin lesion pre-screening tool. Upload images for risk assessment using CNN deep learning and ABCDE criteria analysis. Free educational tool for skin cancer awareness.">
-<meta name="keywords" content="skin lesion, melanoma screening, AI dermatology, skin cancer detection, ABCDE criteria, lesion analysis, deep learning, medical AI">
-<meta name="author" content="Modium">
+<meta name="description" content="modium - AI-powered skin lesion pre-screening tool. Upload images for risk assessment using CNN deep learning and ABCDE criteria analysis. Free educational tool for skin cancer awareness.">
+<meta name="keywords" content="skin lesion, melanoma screening, AI dermatology, skin cancer detection, ABCDE criteria, lesion analysis, deep learning, medical AI, skin cancer risk assessment">
+<meta name="author" content="modium">
 <meta name="robots" content="index, follow">
-<meta property="og:title" content="Modium - AI Skin Lesion Pre-Screening">
-<meta property="og:description" content="Free AI-powered skin lesion risk assessment using deep learning and ABCDE criteria analysis">
+<link rel="canonical" href="https://modium.io">
+
+<!-- Open Graph / Facebook -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://modium.io">
+<meta property="og:title" content="modium - AI Skin Lesion Pre-Screening">
+<meta property="og:description" content="Free AI-powered skin lesion risk assessment using deep learning and ABCDE criteria analysis">
+<meta property="og:site_name" content="modium">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://modium.io">
+<meta name="twitter:title" content="modium - AI Skin Lesion Pre-Screening">
+<meta name="twitter:description" content="Free AI-powered skin lesion risk assessment using deep learning and ABCDE criteria">
+<meta name="twitter:creator" content="@august_yamane">
+
+<!-- Schema.org structured data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "modium",
+  "url": "https://modium.io",
+  "description": "AI-powered skin lesion pre-screening tool for risk assessment",
+  "applicationCategory": "HealthApplication",
+  "operatingSystem": "Web",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "author": {
+    "@type": "Person",
+    "name": "August Yamane",
+    "url": "https://x.com/august_yamane"
+  }
+}
+</script>
 """, unsafe_allow_html=True)
 
 # Google Analytics

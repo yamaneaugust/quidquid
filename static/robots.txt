@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://modium.io/sitemap.xml
+
+# SEO-friendly for medical AI tool
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
