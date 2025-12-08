@@ -67,11 +67,16 @@ class LesionRiskScorer:
         Args:
             class_names: List of class names corresponding to model outputs
         """
-        self.class_names = class_names or ["benign", "suspicious", "malignant"]
+        self.class_names = class_names or ["Low Risk", "Intermediate Risk", "High Risk"]
 
         # Risk weights for different classes (0-1 scale)
         # These should be calibrated based on clinical data
         self.class_risk_weights = {
+            # New naming
+            "low risk": 0.1,
+            "intermediate risk": 0.5,
+            "high risk": 0.9,
+            # Legacy naming (for backward compatibility)
             "benign": 0.1,
             "suspicious": 0.5,
             "malignant": 0.9,

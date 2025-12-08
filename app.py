@@ -221,7 +221,7 @@ def load_model(model_path, class_names):
 
 # Configuration
 MODEL_PATH = "data/models/best_model.pth"
-CLASS_NAMES = ["benign", "suspicious", "malignant"]
+CLASS_NAMES = ["Low Risk", "Intermediate Risk", "High Risk"]
 GDRIVE_FILE_ID = "1zZvamTQyUpMY9lT6HIrBp7OHm-i243FG"  # ResNet50 model (86.56% accuracy)
 
 # Auto-download model from Google Drive if not present

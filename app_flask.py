@@ -25,7 +25,7 @@ Path(app.config['UPLOAD_FOLDER']).mkdir(exist_ok=True)
 
 # Model configuration
 MODEL_PATH = "data/models/best_model.pth"
-CLASS_NAMES = ["benign", "suspicious", "malignant"]
+CLASS_NAMES = ["Low Risk", "Intermediate Risk", "High Risk"]
 
 # Load model on startup
 print("Loading model...")
