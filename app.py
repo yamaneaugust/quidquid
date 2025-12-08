@@ -192,8 +192,8 @@ if st.session_state.get('page') == 'compare':
     st.stop()
 
 # Title
-st.markdown("<p style='text-align: center; font-size: 1.5rem; color: #888888; margin-bottom: 0.5rem; letter-spacing: 8px; font-weight: 300;'>Modium</p>", unsafe_allow_html=True)
-st.markdown("<h1 style='text-align: center; font-size: 3rem; margin-bottom: 0;'>Lesion Pre-Screening</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; font-size: 3.5rem; color: #888888; margin-bottom: 0.5rem; letter-spacing: 8px; font-weight: 300;'>modium</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; font-size: 3rem; font-weight: 300; margin-bottom: 0;'>Lesion Pre-Screening</p>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center; color: #888888; margin-top: 0;'>AI-Powered Skin Cancer Risk Assessment</p>", unsafe_allow_html=True)
 
 # Critical disclaimer
