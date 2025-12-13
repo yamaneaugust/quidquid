@@ -330,15 +330,16 @@ if uploaded_file is not None:
 
             if not is_valid_skin:
                 # Reject non-skin images immediately
-                st.error(f"""
+                st.error("""
                 ⚠️ **NOT A SKIN LESION IMAGE**
 
-                {validation_reason}
+                This does not appear to be a skin lesion image:
+                • High edge density
+                • Low skin-like colors
 
                 **This image appears to be:**
-                - Text or document (Latin homework, screenshots, etc.)
-                - Non-skin photograph (objects, scenery, etc.)
-                - Poor quality or unsuitable for analysis
+                - Text or document
+                - Non-skin photograph
 
                 **Please upload a clear, close-up photo of an actual skin lesion.**
                 """)

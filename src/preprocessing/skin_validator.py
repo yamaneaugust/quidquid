@@ -67,28 +67,24 @@ class SkinLesionValidator:
             aspect_ratio = image.shape[1] / image.shape[0]
             metrics['aspect_ratio'] = aspect_ratio
 
-            # Validation logic
+            # Validation logic - ONLY reject obvious non-skin images
             rejection_reasons = []
 
-            # Check skin color percentage
-            if skin_percentage < 15:
-                rejection_reasons.append(f"Low skin-like colors ({skin_percentage:.1f}% - expected >15%)")
+            # Check skin color percentage (very lenient - only catch completely non-skin)
+            if skin_percentage < 5:
+                rejection_reasons.append("Low skin-like colors")
 
-            # Check edge density (text/documents have very high edge density)
-            if edge_density > 0.25:
-                rejection_reasons.append(f"High edge density ({edge_density:.2f} - suggests text/document)")
+            # Check edge density (only catch very text-heavy documents)
+            if edge_density > 0.40:
+                rejection_reasons.append("High edge density")
 
-            # Check color diversity (screenshots/text have limited palette)
-            if color_diversity < 30:
-                rejection_reasons.append(f"Low color diversity ({color_diversity:.0f} - suggests artificial image)")
+            # Check brightness (only extreme cases)
+            if brightness_score < 20 or brightness_score > 250:
+                rejection_reasons.append("Extreme brightness")
 
-            # Check brightness
-            if brightness_score < 30 or brightness_score > 240:
-                rejection_reasons.append(f"Extreme brightness ({brightness_score:.0f} - expected 30-240)")
-
-            # Check aspect ratio (extreme ratios unlikely)
-            if aspect_ratio < 0.4 or aspect_ratio > 2.5:
-                rejection_reasons.append(f"Unusual aspect ratio ({aspect_ratio:.2f} - expected 0.4-2.5)")
+            # Check aspect ratio (only very extreme ratios)
+            if aspect_ratio < 0.3 or aspect_ratio > 3.5:
+                rejection_reasons.append("Unusual aspect ratio")
 
             # Decision
             if rejection_reasons:
