@@ -185,7 +185,7 @@ st.markdown("<p style='text-align: center; color: #888888; margin-top: 0;'>AI-Po
 
 # Critical disclaimer
 st.error("""
-⚠️ **NOT FOR MEDICAL DIAGNOSIS**
+**NOT FOR MEDICAL DIAGNOSIS**
 This system is for educational and documentation purposes only.
 Always consult a qualified healthcare professional for medical decisions.
 """)
@@ -319,7 +319,7 @@ if uploaded_file is not None:
                 # Warning if not a lesion
                 if is_likely_not_lesion:
                     st.error("""
-                    ⚠️ **WARNING: This may not be a skin lesion**
+                    **WARNING: This may not be a skin lesion**
 
                     The AI model is highly uncertain about this image, suggesting it may not be a skin lesion at all.
 
@@ -356,7 +356,7 @@ if uploaded_file is not None:
                 st.markdown("<h3>Model Predictions</h3>", unsafe_allow_html=True)
 
                 if is_likely_not_lesion:
-                    st.markdown("<p style='color: #ff4444;'>⚠️ Model confidence is extremely low - these predictions are unreliable</p>", unsafe_allow_html=True)
+                    st.markdown("<p style='color: #ff4444;'> Model confidence is extremely low - these predictions are unreliable</p>", unsafe_allow_html=True)
 
                 cols = st.columns(3)
                 for i, (class_name, prob) in enumerate(zip(CLASS_NAMES, predictions)):
